@@ -11,8 +11,7 @@ Simulator::Simulator(const Config& config) :
     int currentId = 0;
     for (int id = 0; id < workshopConfig.N; ++id)
     {
-        Machine machine;
-        machine.id = id;
+        Machine machine(id);
         
         for (int productType : workshopConfig.initialQueues[id])
         {
@@ -21,7 +20,7 @@ Simulator::Simulator(const Config& config) :
             newProduct.setCurrentType(productType);
             
             products.push_back(newProduct);
-            machine.queueProductsIds.push_back(newProduct.getId());
+            machine.addToQueue(newProduct.getId());
             
             ++currentId;
         }
@@ -35,9 +34,9 @@ void Simulator::runSimulation()
     std::priority_queue<Event> eventQueue;
     for (int id = 0; id < workshopConfig.N; ++id)
     {
-        if (!machines[id].queueProductsIds.empty())
+        if (machines[id].getQueueSize() > 0)
         {
-            int productId = machines[id].queueProductsIds.front();
+            int productId = machines[id].startProcessingProduct();
             eventQueue.push({0, EventType::START, productId, id, products[productId].getCurrentType()});
         }
     }
@@ -59,23 +58,25 @@ void Simulator::runSimulation()
         {
             case EventType::START:
             {
-                std::cout << "start " << currentTime << " " << productId << " " << operationType << " " << machineId << "\n";
-                machines[machineId].processingProductId = productId;
-                machines[machineId].queueProductsIds.pop_front();
+                std::cout << "start " << currentTime << " " << productId << " "
+                          << operationType << " " << machineId << "\n";
                 
                 long long duration = workshopConfig.getTime(operationType, machineId);
-                eventQueue.push({currentTime + duration, EventType::FINISH, productId, machineId, operationType});
+                eventQueue.push({currentTime + duration, EventType::FINISH, productId, machineId,
+                                 operationType});
                 break;
             }
             case EventType::FINISH:
             {
-                std::cout << "finish " << currentTime << " " << productId << " " << operationType << " " << machineId << "\n";
-                machines[machineId].processingProductId = -1;
-                if (!machines[machineId].queueProductsIds.empty())
-                {
-                    int nextProductId = machines[machineId].queueProductsIds.front();
-                    eventQueue.push({currentTime, EventType::START, nextProductId, machineId, products[nextProductId].getCurrentType()});
-                }
+                std::cout << "finish " << currentTime << " " << productId << " "
+                          << operationType << " " << machineId << "\n";
+                machines[machineId].finishProcessingProduct();
+                // if (machines[machineId].getQueueSize() > 0)
+                // {
+                //     int nextProductId = machines[machineId].startProcessingProduct();
+                //     eventQueue.push({currentTime, EventType::START, nextProductId, machineId,
+                //                      products[nextProductId].getCurrentType()});
+                // }
 
                 products[productId].setCurrentType(products[productId].getCurrentType() + 1);
                 int nextOperationId = products[productId].getCurrentType();
@@ -87,20 +88,31 @@ void Simulator::runSimulation()
                 else
                 {
                     int bestMachineForNextOperation = selectBestMachine(nextOperationId);
-                    int currentQueueSize = machines[bestMachineForNextOperation].queueProductsIds.size();
+                    int queueSizeBefore = machines[bestMachineForNextOperation].getQueueSize();
                     
-                    eventQueue.push({currentTime, EventType::WAIT, productId, bestMachineForNextOperation, nextOperationId, currentQueueSize});
-                    machines[bestMachineForNextOperation].queueProductsIds.push_back(productId);
+                    eventQueue.push({currentTime, EventType::WAIT, productId,
+                                     bestMachineForNextOperation, nextOperationId, queueSizeBefore});
+                    machines[bestMachineForNextOperation].addToQueue(productId);
                     if (machines[bestMachineForNextOperation].isFree())
                     {
-                        eventQueue.push({currentTime, EventType::START, productId, bestMachineForNextOperation, nextOperationId});
+                        int nextProductId = machines[bestMachineForNextOperation].startProcessingProduct();
+                        eventQueue.push({currentTime, EventType::START, nextProductId,
+                                         bestMachineForNextOperation, nextOperationId});
                     }
+                }
+
+                if (machines[machineId].getQueueSize() > 0)
+                {
+                    int nextProductId = machines[machineId].startProcessingProduct();
+                    eventQueue.push({currentTime, EventType::START, nextProductId, machineId,
+                                     products[nextProductId].getCurrentType()});
                 }
                 break;
             }
             case EventType::WAIT:
             {
-                std::cout << "wait " << currentTime << " " << productId << " " << operationType << " " << machineId << " " << currentEvent.sizeQueueWait << "\n";
+                std::cout << "wait " << currentTime << " " << productId << " "
+                          << operationType << " " << machineId << " " << currentEvent.sizeQueueWait << "\n";
                 break;
             }
             case EventType::READY:
@@ -125,13 +137,7 @@ int Simulator::selectBestMachine(int operationType) const
 
     for (int id = 0; id < workshopConfig.N; ++id)
     {
-        long long currentMachineWaitTime = 0;
-        for (int productId : machines[id].queueProductsIds)
-        {
-            int productType = products[productId].getCurrentType();
-            currentMachineWaitTime += workshopConfig.getTime(productType, id);
-        }
-
+        long long currentMachineWaitTime = machines[id].calculateWorkload(workshopConfig, products);
         if (bestMachineIndex == -1 || currentMachineWaitTime < minWaitTime)
         {
             minWaitTime = currentMachineWaitTime;

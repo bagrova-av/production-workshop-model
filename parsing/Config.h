@@ -13,8 +13,6 @@ struct Config
     std::vector<std::vector<int>> initialQueues;
 
     int getTime(int operationType, int machineId) const;
-
-    static Config loadFromFile(const std::string& fileName);
 };
 
 inline int Config::getTime(int operationType, int machineId) const

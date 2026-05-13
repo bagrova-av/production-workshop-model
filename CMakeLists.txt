@@ -8,6 +8,7 @@ set(SOURCE_LIST
     parsing/InputParser.cpp
     simulation/Simulator.cpp
     domainEntities/Product.cpp
+    domainEntities/Machine.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_LIST})
