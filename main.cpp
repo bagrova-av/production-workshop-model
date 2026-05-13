@@ -1,10 +1,9 @@
-#include <iostream>
-
 #include <vector>
 #include <string>
 #include <algorithm>
 
-#include "Parsing/InputParser.h"
+#include "./Parsing/InputParser.h"
+#include "./Simulation/Simulator.h"
 
 int main(int argc, char** argv)
 {
@@ -13,9 +12,9 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    Config config = Config::loadFromFile(argv[1]);
-
-    std::cout << "Successfully parsed M=" << config.M << " N=" << config.N << '\n';
+    Config config = InputParser::parseFile(argv[1]);
+    Simulator simulator(config);
+    simulator.runSimulation();
 
     return 0;
 }

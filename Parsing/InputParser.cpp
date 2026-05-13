@@ -4,13 +4,13 @@
 #include <fstream>
 #include <sstream>
 
-void exitWithError(const std::string& lineWithError)
+void InputParser::exitWithError(const std::string& lineWithError)
 {
-    std::cout << lineWithError << std::endl;
+    std::cout << lineWithError << '\n';
     exit(0);
 }
 
-Config Config::loadFromFile(const std::string& fileName)
+Config InputParser::parseFile(const std::string& fileName)
 {
     std::ifstream file(fileName);
     if (!file.is_open())

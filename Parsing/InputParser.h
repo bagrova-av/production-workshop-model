@@ -5,21 +5,15 @@
 #include <vector>
 #include <string>
 
-struct Config
+#include "Config.h"
+
+class InputParser
 {
-    int M;
-    int N;
-    std::vector<int> operationsTimes;
-    std::vector<std::vector<int>> initialQueues;
+public:
+    static Config parseFile(const std::string& fileName);
 
-    int getTime(int operationId, int machineId) const;
-
-    static Config loadFromFile(const std::string& fileName);
+private:
+    static void exitWithError(const std::string& line);
 };
-
-inline int Config::getTime(int operationId, int machineId) const
-{
-    return operationsTimes[operationId * N + machineId];
-}
 
 #endif

@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SOURCE_LIST
     main.cpp
     Parsing/InputParser.cpp
+    Simulation/Simulator.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_LIST})
