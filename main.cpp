@@ -2,8 +2,8 @@
 #include <string>
 #include <algorithm>
 
-#include "./Parsing/InputParser.h"
-#include "./Simulation/Simulator.h"
+#include "./parsing/InputParser.h"
+#include "./simulation/Simulator.h"
 
 int main(int argc, char** argv)
 {

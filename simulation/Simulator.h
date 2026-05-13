@@ -2,9 +2,9 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
-#include "../Parsing/InputParser.h"
-#include "../DomainEntities/Machine.h"
-#include "../DomainEntities/Product.h"
+#include "../parsing/InputParser.h"
+#include "../domainEntities/Machine.h"
+#include "../domainEntities/Product.h"
 
 class Simulator
 {

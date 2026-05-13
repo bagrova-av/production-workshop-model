@@ -5,14 +5,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(SOURCE_LIST
     main.cpp
-    Parsing/InputParser.cpp
-    Simulation/Simulator.cpp
+    parsing/InputParser.cpp
+    simulation/Simulator.cpp
+    domainEntities/Product.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_LIST})
 
 target_include_directories (${PROJECT_NAME} PRIVATE
-    DomainEntities/
-    Parsing/
-    Simulation/
+    domainEntities/
+    parsing/
+    simulation/
 )

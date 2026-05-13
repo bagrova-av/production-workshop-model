@@ -1,5 +1,5 @@
 #include "Simulator.h"
-#include "../DomainEntities/Event.h"
+#include "../domainEntities/Event.h"
 
 #include <iostream>
 #include <queue>
@@ -17,11 +17,11 @@ Simulator::Simulator(const Config& config) :
         for (int productType : workshopConfig.initialQueues[id])
         {
             Product newProduct;
-            newProduct.id = currentId;
-            newProduct.currentType = productType;
+            newProduct.setId(currentId);
+            newProduct.setCurrentType(productType);
             
             products.push_back(newProduct);
-            machine.queueProductsIds.push_back(newProduct.id);
+            machine.queueProductsIds.push_back(newProduct.getId());
             
             ++currentId;
         }
@@ -38,7 +38,7 @@ void Simulator::runSimulation()
         if (!machines[id].queueProductsIds.empty())
         {
             int productId = machines[id].queueProductsIds.front();
-            eventQueue.push({0, EventType::START, productId, id, products[productId].currentType});
+            eventQueue.push({0, EventType::START, productId, id, products[productId].getCurrentType()});
         }
     }
 
@@ -74,11 +74,11 @@ void Simulator::runSimulation()
                 if (!machines[machineId].queueProductsIds.empty())
                 {
                     int nextProductId = machines[machineId].queueProductsIds.front();
-                    eventQueue.push({currentTime, EventType::START, nextProductId, machineId, products[nextProductId].currentType});
+                    eventQueue.push({currentTime, EventType::START, nextProductId, machineId, products[nextProductId].getCurrentType()});
                 }
 
-                products[productId].currentType++;
-                int nextOperationId = products[productId].currentType;
+                products[productId].setCurrentType(products[productId].getCurrentType() + 1);
+                int nextOperationId = products[productId].getCurrentType();
 
                 if (nextOperationId == workshopConfig.M - 1)
                 {
@@ -128,7 +128,7 @@ int Simulator::selectBestMachine(int operationType) const
         long long currentMachineWaitTime = 0;
         for (int productId : machines[id].queueProductsIds)
         {
-            int productType = products[productId].currentType;
+            int productType = products[productId].getCurrentType();
             currentMachineWaitTime += workshopConfig.getTime(productType, id);
         }
 
