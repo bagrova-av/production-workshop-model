@@ -2,6 +2,8 @@
 #ifndef EVENT_H
 #define EVENT_H
 
+#include "../common/types.h"
+
 enum class EventType
 {
     FINISH = 0,
@@ -12,21 +14,34 @@ enum class EventType
 
 struct Event
 {
-    long long time;
+    TimePoint time;
     EventType type;
-    int productId;
-    int machineId;
-    int operationType;
-    int sizeQueueWait = 0;
+    ProductId productId;
+    MachineId machineId;
+    OperationId operationType;
+    size_t sizeQueueWait = 0;
 
-    // This element is smaller than the other element if its time is longer
-    bool operator<(const Event& other) const
+    Event(TimePoint time, EventType type, ProductId productId, MachineId machineId,
+          OperationId operationType, size_t sizeQueueWait = 0) :
+        time(time),
+        type(type),
+        productId(productId),
+        machineId(machineId),
+        operationType(operationType),
+        sizeQueueWait(sizeQueueWait)
+    {}
+};
+
+struct EventComparator
+{
+    // The element is smaller than the other element if its time is longer
+    bool operator()(const Event& lhs, const Event& rhs) const
     {
-        if (time != other.time)
+        if (lhs.time != rhs.time)
         {
-            return time > other.time;
+            return lhs.time > rhs.time;
         }
-        return type > other.type; 
+        return static_cast<int>(lhs.type) > static_cast<int>(rhs.type);
     }
 };
 

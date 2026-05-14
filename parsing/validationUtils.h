@@ -6,8 +6,8 @@
 
 bool validateCountProductsTypes(int countProductsTypes);
 bool validateCountMachines(int countMachines);
-bool validateOperationTime(int operationTime);
-bool validateProductType(int productType, const Config& config);
+bool validateOperationTime(TimePoint operationTime);
+bool validateProductType(OperationId productType, const Config& config);
 bool validateTotalCountProducts(int countProducts);
 
 #endif

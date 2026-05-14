@@ -14,8 +14,9 @@ public:
     void runSimulation();
 
 private:
-    int selectBestMachine(int operationType) const;
-    void initializeProducts();
+    int selectBestMachine(OperationId operationType) const;
+    void initializeProducts(Machine& machine, MachineId machineId,
+                            ProductId& currentProductId);
 
 private:
     Config workshopConfig;

@@ -2,26 +2,28 @@
 #ifndef PRODUCT_H
 #define PRODUCT_H
 
+#include "../common/types.h"
+
 class Product
 {
 public:
-    int getId() const;
-    int getCurrentType() const;
+    ProductId getId() const;
+    OperationId getCurrentType() const;
 
-    void setId(int newId);
-    void setCurrentType(int newType);
+    void setId(ProductId newId);
+    void setCurrentType(OperationId newType);
 
 private:
-    int id;
-    int currentType;
+    ProductId id;
+    OperationId currentType;
 };
 
-inline int Product::getId() const
+inline ProductId Product::getId() const
 {
     return id;
 }
 
-inline int Product::getCurrentType() const
+inline OperationId Product::getCurrentType() const
 {
     return currentType;
 }

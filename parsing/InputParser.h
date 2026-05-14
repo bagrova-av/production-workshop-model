@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-#include "Config.h"
+#include "../common/Config.h"
 
 class InputParser
 {

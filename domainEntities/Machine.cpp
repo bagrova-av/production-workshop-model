@@ -9,7 +9,7 @@ void Machine::addToQueue(int productId)
     queueProductsIds.push_back(productId);
 }
 
-int Machine::startProcessingProduct()
+ProductId Machine::startProcessingProduct()
 {
     if (queueProductsIds.empty())
     {
@@ -31,7 +31,7 @@ bool Machine::isFree() const
     return processingProductId == -1;
 }
 
-long long Machine::calculateWorkload(const Config& config, 
+TimePoint Machine::calculateWorkload(const Config& config,
                                      const std::vector<Product>& allProducts) const
 {
     long long totalWaitTime = 0;

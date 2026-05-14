@@ -1,5 +1,5 @@
 #include "validationUtils.h"
-#include "constants.h"
+#include "../common/constants.h"
 
 bool validateCountProductsTypes(int countProductsTypes)
 {
@@ -19,7 +19,7 @@ bool validateCountMachines(int countMachines)
     return true;
 }
 
-bool validateOperationTime(int operationTime)
+bool validateOperationTime(TimePoint operationTime)
 {
     if (operationTime < 0 || operationTime > MAX_OPERATION_TIME)
     {
@@ -28,7 +28,7 @@ bool validateOperationTime(int operationTime)
     return true;
 }
 
-bool validateProductType(int productType, const Config& config)
+bool validateProductType(OperationId productType, const Config& config)
 {
     if (productType < 0 || productType > config.countProductsTypes - 2)
     {

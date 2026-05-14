@@ -1,6 +1,6 @@
 #include "InputParser.h"
 #include "validationUtils.h"
-#include "constants.h"
+#include "../common/constants.h"
 
 #include <iostream>
 #include <fstream>
@@ -54,7 +54,7 @@ Config InputParser::parseFile(const std::string& fileName)
         std::stringstream ssTimes(line);
         for (int j = 0; j < config.countMachines; ++j)
         {
-            int time;
+            TimePoint time;
             if (!(ssTimes >> time))
             {
                 exitWithError(line);
@@ -92,10 +92,10 @@ Config InputParser::parseFile(const std::string& fileName)
             exitWithError(line);
         }
         
-        std::vector<int> queue;
+        std::vector<OperationId> queue;
         for (int counter = 0; counter < queueSize; ++counter)
         {
-            int productType;
+            OperationId productType;
             if (!(ssQueue >> productType))
             {
                 exitWithError(line);

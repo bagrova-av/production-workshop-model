@@ -1,11 +1,11 @@
 #include "Product.h"
 
-void Product::setId(int newId)
+void Product::setId(ProductId newId)
 {
     id = newId;
 }
 
-void Product::setCurrentType(int newType)
+void Product::setCurrentType(OperationId newType)
 {
     currentType = newType;
 }

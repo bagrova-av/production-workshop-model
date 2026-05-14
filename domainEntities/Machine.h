@@ -4,7 +4,7 @@
 
 #include <deque>
 
-#include "../parsing/Config.h"
+#include "../common/Config.h"
 #include "Product.h"
 
 class Machine
@@ -13,28 +13,28 @@ public:
     explicit Machine(int id);
 
     void addToQueue(int productId);
-    int startProcessingProduct();
+    ProductId startProcessingProduct();
     void finishProcessingProduct();
 
     bool isFree() const;
-    int getId() const;
-    int getProcessingProductId() const;
+    MachineId getId() const;
+    ProductId getProcessingProductId() const;
     size_t getQueueSize() const;
 
-    long long calculateWorkload(const Config& config,
+    TimePoint calculateWorkload(const Config& config,
                                 const std::vector<Product>& allProducts) const;
 
 private:
-    int id;
-    std::deque<int> queueProductsIds;
-    int processingProductId = -1;
+    MachineId id;
+    std::deque<ProductId> queueProductsIds;
+    ProductId processingProductId = -1;
 };
 
-inline int Machine::getId() const
+inline MachineId Machine::getId() const
 {
     return id;
 }
-inline int Machine::getProcessingProductId() const
+inline ProductId Machine::getProcessingProductId() const
 {
     return processingProductId;
 }
