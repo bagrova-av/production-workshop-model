@@ -19,6 +19,7 @@ public:
     bool isFree() const;
     MachineId getId() const;
     ProductId getProcessingProductId() const;
+    ProductId getQueueFront() const;
     size_t getQueueSize() const;
 
     TimePoint calculateWorkload(const Config& config,
@@ -37,6 +38,11 @@ inline MachineId Machine::getId() const
 inline ProductId Machine::getProcessingProductId() const
 {
     return processingProductId;
+}
+
+inline ProductId Machine::getQueueFront() const
+{
+    return queueProductsIds.front();
 }
 
 inline size_t Machine::getQueueSize() const

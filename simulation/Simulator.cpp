@@ -100,8 +100,13 @@ void Simulator::runSimulation()
                     eventQueue.push({currentTime, EventType::WAIT,
                                     productId, nextMachineId, nextOperation, queueSizeBefore});
 
-                    // Maybe can start immediately
-                    tryStartMachine(nextMachineId, currentTime, eventQueue);
+                    if (machines[nextMachineId].isFree())
+                    {
+                        ProductId startedProductId = machines[nextMachineId].startProcessingProduct();
+                        eventQueue.push({currentTime, EventType::START,
+                                        startedProductId, nextMachineId,
+                                        products[startedProductId].getCurrentType()});
+                    }
                 }
 
                 // Current machine may process next product
@@ -166,7 +171,14 @@ void Simulator::tryStartMachine(MachineId machineId, TimePoint currentTime,
         return;
     }
 
-    ProductId productId = machines[machineId].startProcessingProduct();
+    ProductId productId = machines[machineId].getQueueFront();
+    if (products[productId].getCurrentType() == workshopConfig.countProductsTypes - 1)
+    {
+        return;
+    }
 
-    eventQueue.push({currentTime, EventType::START, productId, machineId, products[productId].getCurrentType()});
+    productId = machines[machineId].startProcessingProduct();
+
+    eventQueue.push({currentTime, EventType::START,
+                    productId, machineId, products[productId].getCurrentType()});
 }
