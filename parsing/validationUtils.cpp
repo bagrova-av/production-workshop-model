@@ -1,6 +1,16 @@
 #include "validationUtils.h"
 #include "../common/constants.h"
 
+bool checkCorrectNameFile(const std::string& fileName)
+{
+    size_t lenNameFile = fileName.length();
+    if (lenNameFile < 4 || fileName.substr(lenNameFile - 4) != ".txt")
+    {
+        return false;
+    }
+    return true;
+}
+
 bool validateCountProductsTypes(int countProductsTypes)
 {
     if (countProductsTypes < 1 || countProductsTypes > MAX_COUNT_PRODUCT_TYPES)
@@ -30,7 +40,7 @@ bool validateOperationTime(TimePoint operationTime)
 
 bool validateProductType(OperationId productType, const Config& config)
 {
-    if (productType < 0 || productType > config.countProductsTypes - 2)
+    if (productType < 0 || productType > (config.countProductsTypes - 2))
     {
         return false;
     }

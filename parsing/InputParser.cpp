@@ -20,6 +20,12 @@ void InputParser::exitWithError(const std::string& lineWithError)
 
 Config InputParser::parseFile(const std::string& fileName)
 {
+    if (!checkCorrectNameFile(fileName))
+    {
+        std::cout << "The input data file must have a .txt extension" << '\n';
+        exit(0);
+    }
+
     std::ifstream file(fileName);
     if (!file.is_open())
     {

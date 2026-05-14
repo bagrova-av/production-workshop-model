@@ -4,6 +4,8 @@
 
 #include "Config.h"
 
+bool checkCorrectNameFile(const std::string& fileName);
+
 bool validateCountProductsTypes(int countProductsTypes);
 bool validateCountMachines(int countMachines);
 bool validateOperationTime(TimePoint operationTime);

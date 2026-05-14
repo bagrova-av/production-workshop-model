@@ -2,9 +2,12 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
+#include <queue>
+
 #include "../parsing/InputParser.h"
 #include "../domainEntities/Machine.h"
 #include "../domainEntities/Product.h"
+#include "../domainEntities/Event.h"
 
 class Simulator
 {
@@ -14,9 +17,11 @@ public:
     void runSimulation();
 
 private:
-    int selectBestMachine(OperationId operationType) const;
+    int selectBestMachine(OperationId operationId) const;
     void initializeProducts(Machine& machine, MachineId machineId,
                             ProductId& currentProductId);
+    void tryStartMachine(MachineId machineId, TimePoint currentTime,
+                        std::priority_queue<Event, std::vector<Event>, EventComparator>& eventQueue);
 
 private:
     Config workshopConfig;

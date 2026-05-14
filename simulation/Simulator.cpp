@@ -49,14 +49,9 @@ void Simulator::runSimulation()
     }
 
     std::priority_queue<Event, std::vector<Event>, EventComparator> eventQueue;
-    for (int id = 0; id < workshopConfig.countMachines; ++id)
+    for (MachineId machineId = 0; machineId < workshopConfig.countMachines; ++machineId)
     {
-        if (machines[id].getQueueSize() > 0)
-        {
-            int productId = machines[id].startProcessingProduct();
-            eventQueue.push({0, EventType::START,
-                            productId, id, products[productId].getCurrentType()});
-        }
+        tryStartMachine(machineId, 0, eventQueue);
     }
 
     while (!eventQueue.empty())
@@ -67,63 +62,56 @@ void Simulator::runSimulation()
         currentTime = currentEvent.time;
         ProductId productId = currentEvent.productId;
         MachineId machineId = currentEvent.machineId;
-        OperationId operationType = currentEvent.operationType;
+        OperationId operationId = currentEvent.operationId;
 
         switch (currentEvent.type)
         {
             case EventType::START:
             {
                 std::cout << "start " << currentTime << " " << productId << " "
-                          << operationType << " " << machineId << "\n";
+                          << operationId << " " << machineId << "\n";
                 
-                TimePoint duration = workshopConfig.getTime(operationType, machineId);
+                TimePoint duration = workshopConfig.getTime(operationId, machineId);
                 eventQueue.push({currentTime + duration, EventType::FINISH,
-                                productId, machineId, operationType});
+                                productId, machineId, operationId});
                 break;
             }
             case EventType::FINISH:
             {
                 std::cout << "finish " << currentTime << " " << productId << " "
-                          << operationType << " " << machineId << "\n";
+                          << operationId << " " << machineId << "\n";
                 machines[machineId].finishProcessingProduct();
 
+                // Further cycle of the processed product
                 products[productId].setCurrentType(products[productId].getCurrentType() + 1);
-                OperationId nextOperationId = products[productId].getCurrentType();
+                OperationId nextOperation = products[productId].getCurrentType();
 
-                if (nextOperationId == workshopConfig.countProductsTypes - 1)
+                if (nextOperation == (workshopConfig.countProductsTypes - 1))
                 {
                     eventQueue.push({currentTime, EventType::READY,
-                                     productId, machineId, nextOperationId});
+                                    productId, machineId, nextOperation});
                 }
                 else
                 {
-                    MachineId bestMachineForNextOperation = selectBestMachine(nextOperationId);
-                    size_t queueSizeBefore = machines[bestMachineForNextOperation].getQueueSize();
+                    MachineId nextMachineId = selectBestMachine(nextOperation);
+                    size_t queueSizeBefore = machines[nextMachineId].getQueueSize();
                     
+                    machines[nextMachineId].addToQueue(productId);
                     eventQueue.push({currentTime, EventType::WAIT,
-                                    productId, bestMachineForNextOperation, nextOperationId,
-                                    queueSizeBefore});
-                    machines[bestMachineForNextOperation].addToQueue(productId);
-                    if (machines[bestMachineForNextOperation].isFree())
-                    {
-                        ProductId nextProductId = machines[bestMachineForNextOperation].startProcessingProduct();
-                        eventQueue.push({currentTime, EventType::START,
-                                        nextProductId, bestMachineForNextOperation, nextOperationId});
-                    }
+                                    productId, nextMachineId, nextOperation, queueSizeBefore});
+
+                    // Maybe can start immediately
+                    tryStartMachine(nextMachineId, currentTime, eventQueue);
                 }
 
-                if (machines[machineId].isFree() && machines[machineId].getQueueSize() > 0)
-                {
-                    ProductId nextProductId = machines[machineId].startProcessingProduct();
-                    eventQueue.push({currentTime, EventType::START,
-                                    nextProductId, machineId, products[nextProductId].getCurrentType()});
-                }
+                // Current machine may process next product
+                tryStartMachine(machineId, currentTime, eventQueue);
                 break;
             }
             case EventType::WAIT:
             {
                 std::cout << "wait " << currentTime << " " << productId << " "
-                          << operationType << " " << machineId << " " << currentEvent.sizeQueueWait << "\n";
+                          << operationId << " " << machineId << " " << currentEvent.sizeQueueWait << "\n";
                 break;
             }
             case EventType::READY:
@@ -141,7 +129,7 @@ void Simulator::runSimulation()
     }
 }
 
-int Simulator::selectBestMachine(int operationType) const
+int Simulator::selectBestMachine(int operationId) const
 {
     TimePoint minWaitTime = std::numeric_limits<TimePoint>::max();
     int bestMachineIndex = -1;
@@ -163,4 +151,22 @@ int Simulator::selectBestMachine(int operationType) const
         }
     }
     return bestMachineIndex;
+}
+
+void Simulator::tryStartMachine(MachineId machineId, TimePoint currentTime,
+                                std::priority_queue<Event, std::vector<Event>, EventComparator>& eventQueue)
+{
+    if (!machines[machineId].isFree())
+    {
+        return;
+    }
+
+    if (machines[machineId].getQueueSize() == 0)
+    {
+        return;
+    }
+
+    ProductId productId = machines[machineId].startProcessingProduct();
+
+    eventQueue.push({currentTime, EventType::START, productId, machineId, products[productId].getCurrentType()});
 }

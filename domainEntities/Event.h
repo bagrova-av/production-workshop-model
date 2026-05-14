@@ -18,16 +18,16 @@ struct Event
     EventType type;
     ProductId productId;
     MachineId machineId;
-    OperationId operationType;
+    OperationId operationId;
     size_t sizeQueueWait = 0;
 
     Event(TimePoint time, EventType type, ProductId productId, MachineId machineId,
-          OperationId operationType, size_t sizeQueueWait = 0) :
+          OperationId operationId, size_t sizeQueueWait = 0) :
         time(time),
         type(type),
         productId(productId),
         machineId(machineId),
-        operationType(operationType),
+        operationId(operationId),
         sizeQueueWait(sizeQueueWait)
     {}
 };
