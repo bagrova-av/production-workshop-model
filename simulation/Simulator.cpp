@@ -39,6 +39,15 @@ void Simulator::initializeProducts(Machine& machine, MachineId machineId,
 
 void Simulator::runSimulation()
 {
+    int completedProducts = 0;
+    TimePoint currentTime = 0;
+
+    if (totalProductsCount == 0)
+    {
+        std::cout << "stop " << currentTime << "\n";
+        return;
+    }
+
     std::priority_queue<Event, std::vector<Event>, EventComparator> eventQueue;
     for (int id = 0; id < workshopConfig.countMachines; ++id)
     {
@@ -49,9 +58,6 @@ void Simulator::runSimulation()
                             productId, id, products[productId].getCurrentType()});
         }
     }
-
-    int completedProducts = 0;
-    TimePoint currentTime = 0;
 
     while (!eventQueue.empty())
     {
