@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SOURCE_LIST
     main.cpp
     parsing/InputParser.cpp
+    parsing/validationUtils.cpp
     simulation/Simulator.cpp
     domainEntities/Product.cpp
     domainEntities/Machine.cpp

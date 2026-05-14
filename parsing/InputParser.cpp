@@ -1,8 +1,16 @@
 #include "InputParser.h"
+#include "validationUtils.h"
+#include "constants.h"
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
+
+bool InputParser::isLineEmpty(std::stringstream& ss)
+{
+    std::string extra;
+    return !(ss >> extra);
+}
 
 void InputParser::exitWithError(const std::string& lineWithError)
 {
@@ -25,72 +33,89 @@ Config InputParser::parseFile(const std::string& fileName)
     {
         exit(0);
     }
-    std::stringstream ss(line);
-    if (!(ss >> config.M >> config.N))
+    std::stringstream ssWithMN(line);
+    if (!(ssWithMN >> config.countMachines >> config.countProductsTypes) ||
+        !isLineEmpty(ssWithMN))
     {
         exitWithError(line);
     }
-    
-    int unnecessaryInput;
-    if (ss >> unnecessaryInput)
+    if (!validateCountMachines(config.countMachines) ||
+        !validateCountProductsTypes(config.countProductsTypes))
     {
         exitWithError(line);
     }
 
-    for (int i = 0; i < config.M - 1; ++i)
+    for (int i = 0; i < config.countMachines - 1; ++i)
     {
         if (!std::getline(file, line))
         {
             exitWithError(line);
         }
         std::stringstream ssTimes(line);
-        for (int j = 0; j < config.N; ++j)
+        for (int j = 0; j < config.countProductsTypes; ++j)
         {
             int time;
             if (!(ssTimes >> time))
             {
                 exitWithError(line);
             }
+            if (!validateOperationTime(time))
+            {
+                exitWithError(line);
+            }
             config.operationsTimes.push_back(time);
         }
-        if (ssTimes >> unnecessaryInput)
+        if (!isLineEmpty(ssTimes))
         {
             exitWithError(line);
         }
     }
 
-    for (int j = 0; j < config.N; ++j)
+    long long totalProducts = 0;
+    for (int j = 0; j < config.countProductsTypes; ++j)
     {
         if (!std::getline(file, line))
         {
             exitWithError(line);
         }
         std::stringstream ssQueue(line);
-        int qSize;
-        if (!(ssQueue >> qSize))
+        int queueSize;
+        if (!(ssQueue >> queueSize))
+        {
+            exitWithError(line);
+        }
+        if (queueSize < 0)
         {
             exitWithError(line);
         }
         
         std::vector<int> queue;
-        for (int counter = 0; counter < qSize; ++counter)
+        for (int counter = 0; counter < queueSize; ++counter)
         {
-            int type;
-            if (!(ssQueue >> type))
+            int productType;
+            if (!(ssQueue >> productType))
             {
                 exitWithError(line);
             }
-            if (type < 0 || type > config.M - 2)
+            if (!validateProductType(productType, config))
             {
                 exitWithError(line);
             }
-            queue.push_back(type);
+            queue.push_back(productType);
         }
-        if (ssQueue >> unnecessaryInput)
+        if (!isLineEmpty(ssQueue))
         {
             exitWithError(line);
         }
         config.initialQueues.push_back(queue);
+        totalProducts += queueSize;
+    }
+    if (!validateTotalCountProducts(totalProducts))
+    {
+        std::cout << "The total number of products in the workshop exceeds the maximum allowed number"
+                  << std::to_string(MAX_COUNT_PRODUCTS_IN_WORKSHOP) << '\n'
+                  << "The last line in the input file is: " << '\n';
+        exitWithError(line);
     }
 
     return config;

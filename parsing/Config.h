@@ -7,17 +7,19 @@
 
 struct Config
 {
-    int M;
-    int N;
+    int countMachines;
+    int countProductsTypes;
     std::vector<int> operationsTimes;
     std::vector<std::vector<int>> initialQueues;
 
     int getTime(int operationType, int machineId) const;
+    int getCountMachines() const;
+    int getCountProductsTypes() const;
 };
 
 inline int Config::getTime(int operationType, int machineId) const
 {
-    return operationsTimes[operationType * N + machineId];
+    return operationsTimes[operationType * countProductsTypes + machineId];
 }
 
 #endif

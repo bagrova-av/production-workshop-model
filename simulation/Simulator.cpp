@@ -9,7 +9,7 @@ Simulator::Simulator(const Config& config) :
     workshopConfig(config)
 {
     int currentId = 0;
-    for (int id = 0; id < workshopConfig.N; ++id)
+    for (int id = 0; id < workshopConfig.countProductsTypes; ++id)
     {
         Machine machine(id);
         
@@ -32,7 +32,7 @@ Simulator::Simulator(const Config& config) :
 void Simulator::runSimulation()
 {
     std::priority_queue<Event> eventQueue;
-    for (int id = 0; id < workshopConfig.N; ++id)
+    for (int id = 0; id < workshopConfig.countProductsTypes; ++id)
     {
         if (machines[id].getQueueSize() > 0)
         {
@@ -81,7 +81,7 @@ void Simulator::runSimulation()
                 products[productId].setCurrentType(products[productId].getCurrentType() + 1);
                 int nextOperationId = products[productId].getCurrentType();
 
-                if (nextOperationId == workshopConfig.M - 1)
+                if (nextOperationId == workshopConfig.countMachines - 1)
                 {
                     eventQueue.push({currentTime, EventType::READY, productId, machineId, nextOperationId});
                 }
@@ -135,7 +135,7 @@ int Simulator::selectBestMachine(int operationType) const
     long long minWaitTime = -1;
     int bestMachineIndex = -1;
 
-    for (int id = 0; id < workshopConfig.N; ++id)
+    for (int id = 0; id < workshopConfig.countProductsTypes; ++id)
     {
         long long currentMachineWaitTime = machines[id].calculateWorkload(workshopConfig, products);
         if (bestMachineIndex == -1 || currentMachineWaitTime < minWaitTime)

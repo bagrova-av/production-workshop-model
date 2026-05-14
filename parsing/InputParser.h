@@ -14,6 +14,7 @@ public:
 
 private:
     static void exitWithError(const std::string& line);
+    static bool isLineEmpty(std::stringstream& ss);
 };
 
 #endif
