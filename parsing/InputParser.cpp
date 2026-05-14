@@ -34,25 +34,25 @@ Config InputParser::parseFile(const std::string& fileName)
         exit(0);
     }
     std::stringstream ssWithMN(line);
-    if (!(ssWithMN >> config.countMachines >> config.countProductsTypes) ||
+    if (!(ssWithMN >> config.countProductsTypes >> config.countMachines) ||
         !isLineEmpty(ssWithMN))
     {
         exitWithError(line);
     }
-    if (!validateCountMachines(config.countMachines) ||
-        !validateCountProductsTypes(config.countProductsTypes))
+    if (!validateCountProductsTypes(config.countProductsTypes) ||
+        !validateCountMachines(config.countMachines))
     {
         exitWithError(line);
     }
 
-    for (int i = 0; i < config.countMachines - 1; ++i)
+    for (int i = 0; i < config.countProductsTypes - 1; ++i)
     {
         if (!std::getline(file, line))
         {
             exitWithError(line);
         }
         std::stringstream ssTimes(line);
-        for (int j = 0; j < config.countProductsTypes; ++j)
+        for (int j = 0; j < config.countMachines; ++j)
         {
             int time;
             if (!(ssTimes >> time))
@@ -72,10 +72,13 @@ Config InputParser::parseFile(const std::string& fileName)
     }
 
     long long totalProducts = 0;
-    for (int j = 0; j < config.countProductsTypes; ++j)
+    for (int i = 0; i < config.countMachines; ++i)
     {
         if (!std::getline(file, line))
         {
+            std::cout << "The total number of machines (" << std::to_string(config.countMachines) 
+                      << ") in the file is more than the count of machine queue descriptions ("
+                      << std::to_string(i) << ")" << '\n';
             exitWithError(line);
         }
         std::stringstream ssQueue(line);

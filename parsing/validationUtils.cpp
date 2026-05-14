@@ -30,7 +30,7 @@ bool validateOperationTime(int operationTime)
 
 bool validateProductType(int productType, const Config& config)
 {
-    if (productType < 0 || productType > config.countMachines - 2)
+    if (productType < 0 || productType > config.countProductsTypes - 2)
     {
         return false;
     }

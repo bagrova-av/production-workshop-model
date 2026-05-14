@@ -7,8 +7,8 @@
 
 struct Config
 {
-    int countMachines;
     int countProductsTypes;
+    int countMachines;
     std::vector<int> operationsTimes;
     std::vector<std::vector<int>> initialQueues;
 
@@ -19,7 +19,7 @@ struct Config
 
 inline int Config::getTime(int operationType, int machineId) const
 {
-    return operationsTimes[operationType * countProductsTypes + machineId];
+    return operationsTimes[operationType * countMachines + machineId];
 }
 
 #endif
